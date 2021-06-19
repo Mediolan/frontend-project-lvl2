@@ -8,8 +8,6 @@ const helpDescription = () => {
     .arguments('<filepath1> <filepath2>')
     .action((filepath1, filepath2) => {
       console.log(`{\n   ${genDiff(filepath1, filepath2)}\n}`);
-      console.log("Current working directory: ",
-        process.cwd());
     });
 
   program.description('Compares two configuration files and shows a difference.');

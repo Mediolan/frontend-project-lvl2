@@ -11,9 +11,9 @@ const genDiff = (filepath1, filepath2) => {
     .map((key) => {
       if (file1[key] === file2[key]) {
         return `  ${key}: ${file2[key]}`;
-      } if (!file2.hasOwnProperty(key)) {
+      } if (!Object.prototype.hasOwnProperty.call(file2, key)) {
         return `- ${key}: ${file1[key]}`;
-      } if (!file1.hasOwnProperty(key)) {
+      } if (!Object.prototype.hasOwnProperty.call(file1, key)) {
         return `+ ${key}: ${file2[key]}`;
       } if (file1[key] !== file2[key]) {
         const diff = [`- ${key}: ${file1[key]}`, `+ ${key}: ${file2[key]}`];
