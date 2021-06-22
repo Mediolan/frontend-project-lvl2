@@ -1,5 +1,5 @@
 import { Command } from 'commander/esm.mjs';
-import { genDiff } from './genDiff.js';
+import genDiff from './genDiff.js';
 
 const program = new Command();
 
@@ -7,7 +7,7 @@ const helpDescription = () => {
   program
     .arguments('<filepath1> <filepath2>')
     .action((filepath1, filepath2) => {
-      console.log(`{\n   ${genDiff(filepath1, filepath2)}\n}`);
+      console.log(genDiff(filepath1, filepath2));
     });
 
   program.description('Compares two configuration files and shows a difference.');
