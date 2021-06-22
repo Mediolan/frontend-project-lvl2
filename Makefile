@@ -1,5 +1,5 @@
 install: 
-	install-deps
+	npm install
 
 gendiff:
 	./bin/gendiff.js
