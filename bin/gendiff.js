@@ -9,7 +9,8 @@ program
   .option('-f, --format [type]', 'output format', 'stylish')
   .action((filepath1, filepath2) => {
     const options = program.opts();
-    console.log(genDiff(filepath1, filepath2, options.format));
+    const diff = genDiff(filepath1, filepath2, options.format);
+    console.log(diff);
   })
   .description('Compares two configuration files and shows a difference.')
   .version('0.0.1', '-V, --vers', 'output the version number')
