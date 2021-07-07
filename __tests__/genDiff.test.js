@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'url';
-import fs from 'fs';
+import { readFileSync } from 'fs';
 import path, { dirname } from 'path';
 import genDiff from '../index.js';
 import makeObject from '../src/parsers.js';
@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
-const readFile = (filename) => fs.readFileSync(getFixturePath(filename), 'utf-8');
+const readFile = (filename) => readFileSync(getFixturePath(filename), 'utf-8');
 
 test('genDiff', () => {
   expect(genDiff('__fixtures__/file5.json', '__fixtures__/file6.json')).toBe(readFile('expected_file1.txt'));
