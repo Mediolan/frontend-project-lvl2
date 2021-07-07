@@ -15,6 +15,12 @@ test('genDiff', () => {
   expect(genDiff('__fixtures__/file7.yml', '__fixtures__/file8.yaml', 'plain')).toBe(readFile('expected_file2.txt'));
 });
 
+const data = genDiff('__fixtures__/file7.yml', '__fixtures__/file8.yaml', 'json');
+
+test('genDiff2', () => {
+  expect(() => JSON.parse(data)).not.toThrow();
+});
+
 const expected = {
   host: 'hexlet.io',
   timeout: 50,

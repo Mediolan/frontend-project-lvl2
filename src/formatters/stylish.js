@@ -29,7 +29,7 @@ const stylish = (tree, spacesCount = 2, replacer = ' ') => {
       return `${replacer.repeat(spacesCount)}+ ${branch.key}: ${stringify(branch.newValue, 6)}`;
     }
     if (branch.type === 'changed') {
-      return [`${replacer.repeat(spacesCount)}- ${branch.key}: ${stringify(branch.oldValue, 6)}`, `${replacer.repeat(spacesCount)}+ ${branch.key2}: ${stringify(branch.newValue, 6)}`].join('\n');
+      return [`${replacer.repeat(spacesCount)}- ${branch.key}: ${stringify(branch.oldValue, 6)}`, `${replacer.repeat(spacesCount)}+ ${branch.key}: ${stringify(branch.newValue, 6)}`].join('\n');
     }
     return `${replacer.repeat(spacesCount)}  ${branch.key}: ${stringify(branch.value, 6)}`;
   });
