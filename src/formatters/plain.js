@@ -14,8 +14,8 @@ const plain = (tree) => {
     });
 
   const valueFormation = (value) => {
-    if (typeof value === 'boolean' || value === null) {
-      return value.toString();
+    if (typeof value === 'boolean' || value === null || typeof value === 'number') {
+      return value;
     }
     if (typeof value === 'object') {
       return '[complex value]';
