@@ -1,40 +1,28 @@
 const plain = (tree) => {
-  const iter = (node, acc) => node
-    .filter((branch) => branch.type !== 'notModified')
-    .flatMap((branch) => {
-      if (branch.type === 'nested') {
-        return iter(branch.children, [...acc, branch.key]);
-      }
-      if (branch.type === 'changed') {
-        return {
-          path: [...acc, branch.key].join('.'), type: branch.type, value1: branch.oldValue, value2: branch.newValue,
-        };
-      }
-      return { path: [...acc, branch.key].join('.'), type: branch.type, value: branch.oldValue || branch.newValue };
-    });
-
-  const valueFormation = (value) => {
-    if (typeof value === 'boolean' || value === null || typeof value === 'number') {
-      return value;
-    }
-    if (typeof value === 'object') {
+  const stringify = (value) => {
+    if (typeof value === 'object' && value !== null) {
       return '[complex value]';
     }
-    return `'${value}'`;
+    if (typeof value === 'string') {
+      return `'${value}'`;
+    }
+    return value;
+  };
+  const getPropertyName = (pathToKey) => pathToKey.join('.');
+
+  const mapping = {
+    notModified: () => [],
+    deleted: (node, path) => `Property '${getPropertyName(path)}' was removed`,
+    added: (node, path) => `Property '${getPropertyName(path)}' was added with value: ${stringify(node.newValue)}`,
+    changed: (node, path) => `Property '${getPropertyName(path)}' was updated. From ${stringify(node.oldValue)} to ${stringify(node.newValue)}`,
+    nested: ({ children }, path, iter) => iter(children, [...path]),
   };
 
-  const stringify = (formattedTree) => formattedTree.map((node) => {
-    if (node.type === 'deleted') {
-      return `Property '${node.path}' was removed`;
-    }
-    if (node.type === 'added') {
-      return `Property '${node.path}' was added with value: ${valueFormation(node.value)}`;
-    }
-    return `Property '${node.path}' was updated. From ${valueFormation(node.value1)} to ${valueFormation(node.value2)}`;
-  });
-  const result = stringify(iter(tree, [])).join('\n');
+  const buildLines = (node, pathParts = []) => node.flatMap(
+    (branch) => mapping[branch.type](branch, [...pathParts, branch.key], buildLines),
+  );
 
-  return result;
+  return buildLines(tree).join('\n');
 };
 
 export default plain;

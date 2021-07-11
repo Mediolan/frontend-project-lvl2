@@ -2,14 +2,13 @@ import stylish from './stylish.js';
 import plain from './plain.js';
 import json from './json.js';
 
-const selectFormatter = (format) => {
-  if (format === 'plain') {
-    return plain;
-  }
-  if (format === 'json') {
-    return json;
-  }
-  return stylish;
+const format = (tree, formatter) => {
+  const map = {
+    stylish: stylish(tree),
+    plain: plain(tree),
+    json: json(tree),
+  };
+  return map[formatter];
 };
 
-export default selectFormatter;
+export default format;

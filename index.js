@@ -1,13 +1,12 @@
-import makeObject from './src/parsers.js';
+import parse from './src/parsers.js';
 import buildAST from './src/buildAST.js';
-import selectFormatter from './src/formatters/index.js';
+import format from './src/formatters/index.js';
 
 const genDiff = (filepath1, filepath2, formatter) => {
-  const file1 = makeObject(filepath1);
-  const file2 = makeObject(filepath2);
+  const fileFormat = (path) => path.split('.').pop();
+  const file1 = parse(filepath1, fileFormat(filepath1));
+  const file2 = parse(filepath2, fileFormat(filepath2));
   const AST = buildAST(file1, file2);
-  const selectedFormatter = selectFormatter(formatter);
-  const formatted = selectedFormatter(AST);
-  return formatted;
+  return format(AST, formatter);
 };
 export default genDiff;

@@ -1,15 +1,17 @@
 import { readFileSync } from 'fs';
-import path from 'path';
 import pkg from 'js-yaml';
 
 const { load } = pkg;
 
-const makeObject = (pathToFile) => {
-  if (path.extname(pathToFile) === '.yml' || path.extname(pathToFile) === '.yaml') {
-    return load(readFileSync(pathToFile, 'utf8'));
-  }
+const parse = (pathToFile, format) => {
+  const contents = readFileSync(pathToFile, 'utf8');
+  const mapping = {
+    yml: (file) => load(file),
+    yaml: (file) => load(file),
+    json: (file) => JSON.parse(file),
+  };
 
-  return JSON.parse((readFileSync(pathToFile, 'utf8')));
+  return mapping[format](contents);
 };
 
-export default makeObject;
+export default parse;

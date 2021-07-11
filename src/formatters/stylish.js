@@ -1,44 +1,39 @@
-const stylish = (tree, spacesCount = 2, replacer = ' ') => {
-  const stringify = (value, depth) => {
+const stylish = (tree) => {
+  const indent = (depth, prefix = 0, spacesCount = 4) => ' '.repeat(depth * spacesCount - prefix);
+
+  const iter = (value, depth) => {
     if (typeof value !== 'object' || value === null) {
       return `${value}`;
     }
 
-    const indentSize = depth + spacesCount;
-    const currentIndent = replacer.repeat(indentSize);
-    const bracketIndent = replacer.repeat(indentSize - 4);
     const lines = Object
       .entries(value)
-      .map(([key, val]) => `${currentIndent}${key}: ${stringify(val, depth + 4)}`);
+      .map(([key, val]) => `${indent(depth)}${key}: ${iter(val, depth + 1)}`);
 
     return [
       '{',
       ...lines,
-      `${bracketIndent}}`,
+      `${indent(depth - 1)}}`,
     ].join('\n');
   };
 
-  const formattedTree = tree.map((branch) => {
-    if (branch.type === 'nested') {
-      return `${replacer.repeat(spacesCount + 2)}${branch.key}: ${stylish(branch.children, spacesCount + 4)}`;
-    }
-    if (branch.type === 'deleted') {
-      return `${replacer.repeat(spacesCount)}- ${branch.key}: ${stringify(branch.oldValue, 6)}`;
-    }
-    if (branch.type === 'added') {
-      return `${replacer.repeat(spacesCount)}+ ${branch.key}: ${stringify(branch.newValue, 6)}`;
-    }
-    if (branch.type === 'changed') {
-      return [`${replacer.repeat(spacesCount)}- ${branch.key}: ${stringify(branch.oldValue, 6)}`, `${replacer.repeat(spacesCount)}+ ${branch.key}: ${stringify(branch.newValue, 6)}`].join('\n');
-    }
-    return `${replacer.repeat(spacesCount)}  ${branch.key}: ${stringify(branch.value, 6)}`;
-  });
+  const stringify = (notFormattedTree, depth = 1) => {
+    const mapping = {
+      nested: (node) => `${indent(depth, 2)}  ${node.key}: ${stringify(node.children, depth + 1)}`,
+      deleted: (node) => `${indent(depth, 2)}- ${node.key}: ${iter(node.oldValue, depth + 1)}`,
+      added: (node) => `${indent(depth, 2)}+ ${node.key}: ${iter(node.newValue, depth + 1)}`,
+      changed: (node) => [`${indent(depth, 2)}- ${node.key}: ${iter(node.oldValue, depth + 1)}`, `${indent(depth, 2)}+ ${node.key}: ${iter(node.newValue, depth + 1)}`].join('\n'),
+      notModified: (node) => `${indent(depth)}${node.key}: ${iter(node.value, depth + 1)}`,
+    };
+    const diff = notFormattedTree.map((node) => mapping[node.type](node));
 
-  return [
-    '{',
-    ...formattedTree,
-    `${replacer.repeat(spacesCount - 2)}}`,
-  ].join('\n');
+    return [
+      '{',
+      ...diff,
+      `${indent(depth - 1)}}`,
+    ].join('\n');
+  };
+  return stringify(tree);
 };
 
 export default stylish;
