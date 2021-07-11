@@ -1,14 +1,14 @@
 const stylish = (tree) => {
   const indent = (depth, prefix = 0, spacesCount = 4) => ' '.repeat(depth * spacesCount - prefix);
 
-  const iter = (value, depth) => {
-    if (typeof value !== 'object' || value === null) {
-      return `${value}`;
+  const stringify = (content, depth, map) => {
+    if (typeof content !== 'object' || content === null) {
+      return `${content}`;
     }
 
     const lines = Object
-      .entries(value)
-      .map(([key, val]) => `${indent(depth)}${key}: ${iter(val, depth + 1)}`);
+      .entries(content)
+      .map(([key, value]) => map.notModified({ key, value }, depth));
 
     return [
       '{',
@@ -17,23 +17,27 @@ const stylish = (tree) => {
     ].join('\n');
   };
 
-  const stringify = (notFormattedTree, depth = 1) => {
-    const mapping = {
-      nested: (node) => `${indent(depth, 2)}  ${node.key}: ${stringify(node.children, depth + 1)}`,
-      deleted: (node) => `${indent(depth, 2)}- ${node.key}: ${iter(node.oldValue, depth + 1)}`,
-      added: (node) => `${indent(depth, 2)}+ ${node.key}: ${iter(node.newValue, depth + 1)}`,
-      changed: (node) => [`${indent(depth, 2)}- ${node.key}: ${iter(node.oldValue, depth + 1)}`, `${indent(depth, 2)}+ ${node.key}: ${iter(node.newValue, depth + 1)}`].join('\n'),
-      notModified: (node) => `${indent(depth)}${node.key}: ${iter(node.value, depth + 1)}`,
-    };
-    const diff = notFormattedTree.map((node) => mapping[node.type](node));
+  const mapping = {
+    nested: (node, depth, iter) => `${indent(depth)}${node.key}: ${iter(node.children, depth + 1)}`,
+    deleted: (node, depth) => `${indent(depth, 2)}- ${node.key}: ${stringify(node.oldValue, depth + 1, mapping)}`,
+    added: (node, depth) => `${indent(depth, 2)}+ ${node.key}: ${stringify(node.newValue, depth + 1, mapping)}`,
+    changed: (node, depth) => [`${indent(depth, 2)}- ${node.key}: ${stringify(node.oldValue, depth + 1, mapping)}`,
+      `${indent(depth, 2)}+ ${node.key}: ${stringify(node.newValue, depth + 1, mapping)}`].join('\n'),
+    notModified: (node, depth) => `${indent(depth)}${node.key}: ${stringify(node.value, depth + 1, mapping)}`,
+  };
 
+  const buildDiff = (node, depth = 1) => {
+    const diff = node.flatMap(
+      (branch) => mapping[branch.type](branch, depth, buildDiff),
+    );
     return [
       '{',
       ...diff,
       `${indent(depth - 1)}}`,
     ].join('\n');
   };
-  return stringify(tree);
+
+  return buildDiff(tree);
 };
 
 export default stylish;
