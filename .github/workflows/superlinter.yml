@@ -4,20 +4,17 @@ name: Super-Linter
 on: push
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    strategy:
   
-      matrix:
-        node-version: [14.x]
-
   super-lint:
     # Name the Job
     name: Lint code base
     # Set the type of machine to run on
     runs-on: ubuntu-latest
+
+    strategy:
+      # Node versions list
+      matrix:
+        node-version: [14.x]
 
     steps:
         # Check-out repository under GitHub workspace
