@@ -10,24 +10,28 @@ const __dirname = dirname(__filename);
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
 const readFile = (filename) => readFileSync(getFixturePath(filename), 'utf-8');
 
-test('genDiff', () => {
-  expect(genDiff('__fixtures__/file5.json', '__fixtures__/file6.json', 'stylish')).toBe(readFile('expected_file1.txt'));
-  expect(genDiff('__fixtures__/file7.yml', '__fixtures__/file8.yaml', 'plain')).toBe(readFile('expected_file2.txt'));
+describe('genDiff', () => {
+  test('stylish', () => {
+    expect(genDiff(getFixturePath('file5.json'), getFixturePath('file6.json'))).toBe(readFile('expected_file1.txt'));
+  });
+  test('plain', () => {
+    expect(genDiff(getFixturePath('file7.yml'), getFixturePath('file8.yaml'), 'plain')).toBe(readFile('expected_file2.txt'));
+  });
+  test('json', () => {
+    expect(genDiff(getFixturePath('file7.yml'), getFixturePath('file8.yaml'), 'json')).toBe(readFile('expected_file3.json'));
+  });
+  test('jsonValidation', () => {
+    const data = genDiff(getFixturePath('file7.yml'), getFixturePath('file8.yaml'), 'json');
+    expect(() => JSON.parse(data)).not.toThrow();
+  });
 });
-
-const data = genDiff('__fixtures__/file7.yml', '__fixtures__/file8.yaml', 'json');
-
-test('genDiff2', () => {
-  expect(() => JSON.parse(data)).not.toThrow();
-});
-
-const expected = {
-  host: 'hexlet.io',
-  timeout: 50,
-  proxy: '123.234.53.22',
-  follow: false,
-};
 
 test('parse', () => {
-  expect(parse('__fixtures__/file1.json', 'yml')).toStrictEqual(expected);
+  const expected = {
+    host: 'hexlet.io',
+    timeout: 50,
+    proxy: '123.234.53.22',
+    follow: false,
+  };
+  expect(parse(getFixturePath('file1.json'), 'yml')).toStrictEqual(expected);
 });

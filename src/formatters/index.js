@@ -2,13 +2,12 @@ import stylish from './stylish.js';
 import plain from './plain.js';
 import json from './json.js';
 
-const format = (tree, formatter) => {
-  const map = {
-    stylish: stylish(tree),
-    plain: plain(tree),
-    json: json(tree),
-  };
-  return map[formatter];
+const mapping = {
+  stylish: (node) => stylish(node),
+  plain: (node) => plain(node),
+  json: (node) => json(node),
 };
+
+const format = (tree, formatter) => mapping[formatter](tree);
 
 export default format;
