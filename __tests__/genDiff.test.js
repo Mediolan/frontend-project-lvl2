@@ -33,5 +33,5 @@ test('parse', () => {
     proxy: '123.234.53.22',
     follow: false,
   };
-  expect(parse(getFixturePath('file1.json'), 'yml')).toStrictEqual(expected);
+  expect(parse(readFile('file1.json'), 'yml')).toStrictEqual(expected);
 });

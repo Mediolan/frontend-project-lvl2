@@ -1,9 +1,6 @@
-import { readFileSync } from 'fs';
 import pkg from 'js-yaml';
 
 const { load } = pkg;
-
-const readFile = (pathToFile) => readFileSync(pathToFile, 'utf8');
 
 const mapping = {
   yml: (file) => load(file),
@@ -11,10 +8,6 @@ const mapping = {
   json: (file) => JSON.parse(file),
 };
 
-const parse = (pathToFile, format) => {
-  const contents = readFile(pathToFile);
-
-  return mapping[format](contents);
-};
+const parse = (contents, format) => mapping[format](contents);
 
 export default parse;
